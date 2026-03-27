@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -89,7 +89,7 @@ def create_goal():
         name=data["name"],
         target_amount=target,
         currency=data.get("currency") or (user.preferred_currency if user else "INR"),
-        deadline=(data["deadline"] if data.get("deadline") else None),
+        deadline=(date.fromisoformat(data["deadline"]) if data.get("deadline") else None),
     )
     db.session.add(goal)
     db.session.flush()
@@ -127,7 +127,7 @@ def update_goal(goal_id: int):
     if "currency" in data:
         goal.currency = data["currency"]
     if "deadline" in data:
-        goal.deadline = data["deadline"] if data["deadline"] else None
+        goal.deadline = date.fromisoformat(data["deadline"]) if data["deadline"] else None
 
     _update_milestones(goal)
     db.session.commit()
